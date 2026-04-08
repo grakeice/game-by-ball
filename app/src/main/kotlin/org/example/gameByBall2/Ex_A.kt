@@ -23,17 +23,17 @@ object ExA {
     }
 
     class Third : PApplet() {
-        private val width = 5
-        private val height = 5
+        private val fieldWidth = 5
+        private val fieldHeight = 5
 
         override fun settings() {
-            size((width + 1) * 100, (height + 1) * 100)
+            size((fieldWidth + 1) * 100, (fieldHeight + 1) * 100)
         }
 
         override fun draw() {
             var count = 0
-            for (x in 0 until width) {
-                for (y in 0 until height) {
+            for (x in 0 until fieldWidth) {
+                for (y in 0 until fieldHeight) {
                     when {
                         count % 7 == 0 && count % 3 == 0 -> fill(color(0, 255, 255))
                         count % 7 == 0 -> fill(color(0, 0, 255))
