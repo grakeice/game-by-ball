@@ -13,7 +13,8 @@ object ExC {
 	class Shape(
 		val radius: Float,
 		var position: Coordinate = Coordinate(0f, 0f),
-		var speed: Coordinate = Coordinate(0f, 0f)
+		var speed: Coordinate = Coordinate(0f, 0f),
+		var restitution: Float = 0.95f
 	)
 
 	class Field {
@@ -26,11 +27,13 @@ object ExC {
 		/* 空気抵抗 */
 		val airResistance = 0.99f
 
-		/*接線方向の壁摩擦*/
+		/* 接線方向の壁摩擦 */
 		val wallFriction = 0.95f
 
 		/* 反発係数 */
 		val restitution = 0.95f
+
+
 		var shapes = mutableListOf(Shape(10f, Coordinate(50f, 50f), Coordinate(5f, 2f)))
 
 		fun addShape(shape: Shape) {
@@ -50,19 +53,31 @@ object ExC {
 				// 左右壁判定
 				if (newPosition.x - shape.radius < 0) {
 					newPosition = Coordinate(shape.radius, newPosition.y)
-					velocity = Coordinate(-velocity.x * restitution, velocity.y * wallFriction)
+					velocity = Coordinate(
+						-velocity.x * restitution * shape.restitution,
+						velocity.y * wallFriction * shape.restitution
+					)
 				} else if (newPosition.x + shape.radius > x) {
 					newPosition = Coordinate(x - shape.radius, newPosition.y)
-					velocity = Coordinate(-velocity.x * restitution, velocity.y * wallFriction)
+					velocity = Coordinate(
+						-velocity.x * restitution * shape.restitution,
+						velocity.y * wallFriction * shape.restitution
+					)
 				}
 
 				// 上下壁判定
 				if (newPosition.y - shape.radius < 0) {
 					newPosition = Coordinate(newPosition.x, shape.radius)
-					velocity = Coordinate(velocity.x * wallFriction, -velocity.y * restitution)
+					velocity = Coordinate(
+						velocity.x * wallFriction * shape.restitution,
+						-velocity.y * restitution * shape.restitution
+					)
 				} else if (newPosition.y + shape.radius > y) {
 					newPosition = Coordinate(newPosition.x, y - shape.radius)
-					velocity = Coordinate(velocity.x * wallFriction, -velocity.y * restitution)
+					velocity = Coordinate(
+						velocity.x * wallFriction * shape.restitution,
+						-velocity.y * restitution * shape.restitution
+					)
 				}
 
 				shape.speed = velocity
