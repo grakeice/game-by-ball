@@ -6,7 +6,9 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
+    // Apply the Kotlin JVM plugin to add support for Kotlin.
+    kotlin("jvm") version "2.1.10"
+    // Apply the application plugin to add support for building a CLI application.
     application
 }
 
@@ -34,9 +36,13 @@ java {
     }
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "org.example.AppKt"
 }
 
 tasks.named<JavaExec>("run") {
