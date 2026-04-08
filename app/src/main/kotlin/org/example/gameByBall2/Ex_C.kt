@@ -1,6 +1,7 @@
 package org.example.gameByBall2
 
 import processing.core.PApplet
+import kotlin.random.Random
 
 object ExC {
 	data class Coordinate(val x: Float, val y: Float) {
@@ -14,27 +15,33 @@ object ExC {
 		val radius: Float,
 		var position: Coordinate = Coordinate(0f, 0f),
 		var speed: Coordinate = Coordinate(0f, 0f),
-		var restitution: Float = 0.95f
+		val restitution: Float = 0.95f
 	)
 
 	class Field {
 		val x = 500
 		val y = 500
 
-		/* 重力加速度*/
+		/** 重力加速度 */
 		val gravity = 0.3f
 
-		/* 空気抵抗 */
+		/** 空気抵抗 */
 		val airResistance = 0.99f
 
-		/* 接線方向の壁摩擦 */
+		/** 接線方向の壁摩擦 */
 		val wallFriction = 0.95f
 
-		/* 反発係数 */
+		/** 反発係数 */
 		val restitution = 0.95f
 
 
-		var shapes = mutableListOf(Shape(10f, Coordinate(50f, 50f), Coordinate(5f, 2f)))
+		var shapes = MutableList(5) {
+			Shape(
+				Random.nextDouble(3.toDouble(), 20.toDouble()).toFloat(),
+				Coordinate(250f, 0f),
+				Coordinate(Random.nextDouble((-10).toDouble(), 10.toDouble()).toFloat(), 0f),
+			)
+		}
 
 		fun addShape(shape: Shape) {
 			shapes.add(shape)
