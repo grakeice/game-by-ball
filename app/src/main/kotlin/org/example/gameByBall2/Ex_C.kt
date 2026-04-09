@@ -51,9 +51,9 @@ object ExC {
 
 		var shapes = MutableList(ballCount) {
 			Shape(
-				Random.nextDouble(10.toDouble(), 20.toDouble()).toFloat(),
-				Vector(Random.nextDouble(0.toDouble(), x.toDouble()).toFloat(), 30f),
-				Vector(Random.nextDouble((-10).toDouble(), 10.toDouble()).toFloat(), 0f),
+				Random.nextDouble(10.0, 20.0).toFloat(),
+				Vector(Random.nextDouble(0.0, x.toDouble()).toFloat(), 30f),
+				Vector(Random.nextDouble(-10.0, 10.0).toFloat(), 0f),
 			)
 		}
 
