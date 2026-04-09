@@ -5,18 +5,18 @@ import kotlin.random.Random
 import kotlin.math.hypot
 
 object ExC {
-	data class Coordinate(val x: Float, val y: Float) {
-		operator fun plus(other: Coordinate) = Coordinate(x + other.x, y + other.y)
-		operator fun minus(other: Coordinate) = Coordinate(x - other.x, y - other.y)
-		operator fun times(scalar: Float) = Coordinate(x * scalar, y * scalar)
-		operator fun div(scalar: Float) = Coordinate(x / scalar, y / scalar)
-		operator fun unaryMinus() = Coordinate(-x, -y)
+	data class Vector(val x: Float, val y: Float) {
+		operator fun plus(other: Vector) = Vector(x + other.x, y + other.y)
+		operator fun minus(other: Vector) = Vector(x - other.x, y - other.y)
+		operator fun times(scalar: Float) = Vector(x * scalar, y * scalar)
+		operator fun div(scalar: Float) = Vector(x / scalar, y / scalar)
+		operator fun unaryMinus() = Vector(-x, -y)
 	}
 
 	class Shape(
 		val radius: Float,
-		var position: Coordinate = Coordinate(0f, 0f),
-		var speed: Coordinate = Coordinate(0f, 0f),
+		var position: Vector = Vector(0f, 0f),
+		var speed: Vector = Vector(0f, 0f),
 		val restitution: Float = 0.95f,
 		val isMouseControlled: Boolean = false
 	)
@@ -47,13 +47,13 @@ object ExC {
 		val mouseRepulsionRange = 150f
 
 		/** マウスの位置 */
-		val mouse = Shape(50f, Coordinate(0f, 0f), Coordinate(0f, 0f), 0f, isMouseControlled = true)
+		val mouse = Shape(50f, Vector(0f, 0f), Vector(0f, 0f), 0f, isMouseControlled = true)
 
 		var shapes = MutableList(ballCount) {
 			Shape(
 				Random.nextDouble(10.toDouble(), 20.toDouble()).toFloat(),
-				Coordinate(Random.nextDouble(0.toDouble(), x.toDouble()).toFloat(), 30f),
-				Coordinate(Random.nextDouble((-10).toDouble(), 10.toDouble()).toFloat(), 0f),
+				Vector(Random.nextDouble(0.toDouble(), x.toDouble()).toFloat(), 30f),
+				Vector(Random.nextDouble((-10).toDouble(), 10.toDouble()).toFloat(), 0f),
 			)
 		}
 
@@ -66,14 +66,13 @@ object ExC {
 		}
 
 		fun compute() {
-			// 新しい速度と位置を一時保存
 			val newVelocities = shapes.map { it.speed }.toMutableList()
 			val newPositions = shapes.map { it.position }.toMutableList()
 
 			for ((i, shape) in shapes.withIndex()) {
 				if (!shape.isMouseControlled) {
 					// 重力加速度の加算
-					var velocity = newVelocities[i] + Coordinate(0f, gravity)
+					var velocity = newVelocities[i] + Vector(0f, gravity)
 
 					// 空気抵抗の計算
 					velocity *= airResistance
@@ -92,14 +91,14 @@ object ExC {
 
 					// 左右壁判定
 					if (newPosition.x - shape.radius < 0) {
-						newPosition = Coordinate(shape.radius, newPosition.y)
-						velocity = Coordinate(
+						newPosition = Vector(shape.radius, newPosition.y)
+						velocity = Vector(
 							-velocity.x * restitution * shape.restitution,
 							velocity.y * wallFriction * shape.restitution
 						)
 					} else if (newPosition.x + shape.radius > x) {
-						newPosition = Coordinate(x - shape.radius, newPosition.y)
-						velocity = Coordinate(
+						newPosition = Vector(x - shape.radius, newPosition.y)
+						velocity = Vector(
 							-velocity.x * restitution * shape.restitution,
 							velocity.y * wallFriction * shape.restitution
 						)
@@ -107,14 +106,14 @@ object ExC {
 
 					// 上下壁判定
 					if (newPosition.y - shape.radius < 0) {
-						newPosition = Coordinate(newPosition.x, shape.radius)
-						velocity = Coordinate(
+						newPosition = Vector(newPosition.x, shape.radius)
+						velocity = Vector(
 							velocity.x * wallFriction * shape.restitution,
 							-velocity.y * restitution * shape.restitution
 						)
 					} else if (newPosition.y + shape.radius > y) {
-						newPosition = Coordinate(newPosition.x, y - shape.radius)
-						velocity = Coordinate(
+						newPosition = Vector(newPosition.x, y - shape.radius)
+						velocity = Vector(
 							velocity.x * wallFriction * shape.restitution,
 							-velocity.y * restitution * shape.restitution
 						)
@@ -137,7 +136,7 @@ object ExC {
 
 					if (dist < minDist && dist > 0f) {
 						/** 単位法線ベクトル */
-						val normal = Coordinate(delta.x, delta.y) / dist
+						val normal = Vector(delta.x, delta.y) / dist
 
 						// マウスによる衝突は物体をは一方的に押す
 						if (shape.isMouseControlled) {
@@ -194,7 +193,7 @@ object ExC {
 				fill(color(255, 255, 255))
 				ellipse(shape.position.x, shape.position.y, shape.radius * 2, shape.radius * 2)
 			}
-			field.mouse.position = Coordinate(mouseX.toFloat(), mouseY.toFloat())
+			field.mouse.position = Vector(mouseX.toFloat(), mouseY.toFloat())
 			field.compute()
 		}
 	}
