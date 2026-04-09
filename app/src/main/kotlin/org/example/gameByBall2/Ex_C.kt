@@ -40,6 +40,12 @@ object ExC {
 		/** ボールの数 */
 		val ballCount = 200
 
+		/** マウスからの斥力の強さ */
+		val mouseRepulsionForce = 1f
+
+		/** マウスからの斥力の範囲 */
+		val mouseRepulsionRange = 150f
+
 		/** マウスの位置 */
 		val mouse = Shape(50f, Coordinate(0f, 0f), Coordinate(0f, 0f), 0f, isMouseControlled = true)
 
@@ -65,49 +71,59 @@ object ExC {
 			val newPositions = shapes.map { it.position }.toMutableList()
 
 			for ((i, shape) in shapes.withIndex()) {
+				if (!shape.isMouseControlled) {
+					// 重力加速度の加算
+					var velocity = newVelocities[i] + Coordinate(0f, gravity)
 
-				// 重力加速度の加算
-				var velocity = newVelocities[i] + Coordinate(0f, gravity)
+					// 空気抵抗の計算
+					velocity *= airResistance
 
-				// 空気抵抗の計算
-				velocity *= airResistance
+					val deltaFromMouse = newPositions[i] - mouse.position
+					val distFromMouse = hypot(deltaFromMouse.x, deltaFromMouse.y)
 
-				var newPosition = newPositions[i] + velocity
+					// マウスから斥力を発生させる
+					if (distFromMouse < mouseRepulsionRange && distFromMouse > 0f) {
+						val repulsionStrength = mouseRepulsionForce * (1f - distFromMouse / mouseRepulsionRange)
+						val repulsionDirection = deltaFromMouse / distFromMouse
+						velocity += repulsionDirection * repulsionStrength
+					}
 
-				// 左右壁判定
-				if (newPosition.x - shape.radius < 0) {
-					newPosition = Coordinate(shape.radius, newPosition.y)
-					velocity = Coordinate(
-						-velocity.x * restitution * shape.restitution,
-						velocity.y * wallFriction * shape.restitution
-					)
-				} else if (newPosition.x + shape.radius > x) {
-					newPosition = Coordinate(x - shape.radius, newPosition.y)
-					velocity = Coordinate(
-						-velocity.x * restitution * shape.restitution,
-						velocity.y * wallFriction * shape.restitution
-					)
+					var newPosition = newPositions[i] + velocity
+
+					// 左右壁判定
+					if (newPosition.x - shape.radius < 0) {
+						newPosition = Coordinate(shape.radius, newPosition.y)
+						velocity = Coordinate(
+							-velocity.x * restitution * shape.restitution,
+							velocity.y * wallFriction * shape.restitution
+						)
+					} else if (newPosition.x + shape.radius > x) {
+						newPosition = Coordinate(x - shape.radius, newPosition.y)
+						velocity = Coordinate(
+							-velocity.x * restitution * shape.restitution,
+							velocity.y * wallFriction * shape.restitution
+						)
+					}
+
+					// 上下壁判定
+					if (newPosition.y - shape.radius < 0) {
+						newPosition = Coordinate(newPosition.x, shape.radius)
+						velocity = Coordinate(
+							velocity.x * wallFriction * shape.restitution,
+							-velocity.y * restitution * shape.restitution
+						)
+					} else if (newPosition.y + shape.radius > y) {
+						newPosition = Coordinate(newPosition.x, y - shape.radius)
+						velocity = Coordinate(
+							velocity.x * wallFriction * shape.restitution,
+							-velocity.y * restitution * shape.restitution
+						)
+					}
+
+					newVelocities[i] = velocity
+					newPositions[i] = newPosition
 				}
-
-				// 上下壁判定
-				if (newPosition.y - shape.radius < 0) {
-					newPosition = Coordinate(newPosition.x, shape.radius)
-					velocity = Coordinate(
-						velocity.x * wallFriction * shape.restitution,
-						-velocity.y * restitution * shape.restitution
-					)
-				} else if (newPosition.y + shape.radius > y) {
-					newPosition = Coordinate(newPosition.x, y - shape.radius)
-					velocity = Coordinate(
-						velocity.x * wallFriction * shape.restitution,
-						-velocity.y * restitution * shape.restitution
-					)
-				}
-
-				newVelocities[i] = velocity
-				newPositions[i] = newPosition
 			}
-
 			// 物体同士の衝突判定
 			for (i in shapes.indices) {
 				for (j in (i + 1) until shapes.size) {
@@ -167,6 +183,7 @@ object ExC {
 		}
 
 		override fun draw() {
+			noCursor()
 			background(color(255, 255, 255))
 			for ((index, shape) in field.shapes.withIndex()) {
 				if (index == field.shapes.size - 1) {
