@@ -15,6 +15,7 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+	maven {url = uri("https://jitpack.io")}
 }
 
 dependencies {
@@ -27,6 +28,11 @@ dependencies {
     implementation(libs.guava)
 
     implementation("org.processing:core:4.5.2")
+	implementation("com.github.processing:processing-sound:v2.3.0")
+	implementation("com.github.philburk:jsyn:latest.release")
+implementation ("fr.delthas:javamp3:1.0.1")
+implementation("net.compartmental.code:minim:2.2.2")
+
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

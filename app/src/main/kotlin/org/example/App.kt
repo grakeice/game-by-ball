@@ -7,6 +7,7 @@ data class Example(val name: String, val description: String, val launcher: () -
 
 // ✨ Add new examples here - just add a new Example() entry!
 private val EXAMPLES = listOf(
+	Example("game by ball", "") { org.example.gameByBall.main() },
 	Example("Ex_A", "Blue and white circles in diagonal pattern") { org.example.gameByBall2.ExA.main() },
 	Example("Ex_B", "Random sized circles in horizontal line") { org.example.gameByBall2.ExB.main() },
 	Example("Ex_C", "Bouncing ball in field") { org.example.gameByBall2.ExC.main() }
